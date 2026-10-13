@@ -1,31 +1,46 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define TestFile "C:/Users/Leon/CLionProjects/HexEditor/Test/flightrunner.ch8"
 
+long getFileSize(FILE *fileptr);
+void readFile(FILE *fileptr,long size);
+
 int main(void) {
-    unsigned char buffer[16]={0};
-    FILE *fileptr;
+    long size = 0;
+    FILE *fileptr=fopen(TestFile, "rb");
 
     //printf("Provide a absolute Path to a File\n");
 
-    fileptr = fopen(TestFile, "rb");
-
     if (fileptr == NULL) {
-        printf("Invalid Path\n");
+        printf("File not found\n");
         return 1;
     }
 
-    while (1==1) {
-        fgets(buffer, sizeof(buffer)/sizeof(char), fileptr);
-
-        for (int i=0; i<sizeof(buffer)/sizeof(char); i++) {
-            printf("%2X", buffer[i]);
-            printf(" ");
-        }
-    }
+    size = getFileSize(fileptr);
+    readFile(fileptr,size);
 
     fclose(fileptr);
-    getchar();
+
     return 0;
+}
+
+long getFileSize(FILE *fileptr) {
+    long fileSize = 0;
+    fseek(fileptr, 0, SEEK_END);
+    fileSize = ftell(fileptr);
+    rewind(fileptr);
+
+    return fileSize;
+}
+
+void readFile(FILE *fileptr,long size) {
+    unsigned char buffer[16]={0};
+    for (long i=0;i<size;i++) {
+        fread(&buffer[i],1,16,fileptr);
+        for (int j=0;j<16;j++) {
+            printf("%X",buffer[i]);
+        }
+    }
 }
