@@ -6,9 +6,12 @@
 
 long getFileSize(FILE *fileptr);
 void readFile(FILE *fileptr,long size);
+void modifyFile(FILE *fileptr,long size);
+void handleInput();
 
 int main(void) {
-    long size = 0;
+    bool changeOccured = true;
+    unsigned long size = 0;
     FILE *fileptr=fopen(TestFile, "rb");
 
     //printf("Provide a absolute Path to a File\n");
@@ -19,7 +22,13 @@ int main(void) {
     }
 
     size = getFileSize(fileptr);
-    readFile(fileptr,size);
+
+    while (1==1) {
+        if (changeOccured) {
+            readFile(fileptr,size);
+            changeOccured = false;
+        }
+    }
 
     fclose(fileptr);
 
@@ -36,11 +45,16 @@ long getFileSize(FILE *fileptr) {
 }
 
 void readFile(FILE *fileptr,long size) {
-    unsigned char buffer[16]={0};
+    unsigned char curChar;
+
     for (long i=0;i<size;i++) {
-        fread(&buffer[i],1,16,fileptr);
-        for (int j=0;j<16;j++) {
-            printf("%X",buffer[i]);
+        curChar = fgetc(fileptr);
+
+        if (curChar == EOF) {
+            break;
         }
+
+        printf("%X",curChar);
+        printf(" ");
     }
 }
