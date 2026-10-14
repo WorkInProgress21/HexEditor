@@ -4,12 +4,12 @@
 #include "stdbool.h"
 #include "conio.h"
 
-#define TestFile "C:/Users/backy/Desktop/HexEditor/Test/flightrunner.ch8"
+#define TestFile "C:/Users/Leon/CLionProjects/HexEditor/Test/flightrunner.ch8"
 
 long getFileSize(FILE *fileptr);
-void readFile(FILE *fileptr,long size);
-void modifyFile(FILE *fileptr,long size);
-void handleInput(int*,int*);
+void readFile(FILE *fileptr,unsigned long size, unsigned char*array);
+void displayFile(unsigned char*array,unsigned long size);
+void handleCursor(unsigned long *X,unsigned long *Y);
 
 int main(void) {
     bool changeOccured = true;
@@ -26,13 +26,15 @@ int main(void) {
     }
 
     size = getFileSize(fileptr);
+    unsigned char fileArray[size];
 
-    while (1==1) {
+    while (true) {
         if (changeOccured) {
-            readFile(fileptr,size);
+            readFile(fileptr,size,fileArray);
+            displayFile(fileArray,size);
             changeOccured = false;
         }
-        handleInput(&cursorX,&cursorY);
+        getch();
     }
 
     fclose(fileptr);
@@ -49,45 +51,28 @@ long getFileSize(FILE *fileptr) {
     return fileSize;
 }
 
-void readFile(FILE *fileptr,long size) {
-    unsigned char curChar;
+void readFile(FILE *fileptr,unsigned long size,unsigned char* Array) {
+    fread(Array,1,size,fileptr);
+
+}
+
+void displayFile(unsigned char*array,unsigned long size) {
+    long currentPos = 0;
 
     for (long i=0;i<size;i++) {
-        curChar = fgetc(fileptr);
-
-        if (curChar == EOF) {
-            break;
-        }
-
-        printf("%X",curChar);
+        printf("%02X",array[i]);
         printf(" ");
+        if ((i+1)%16 == 0) {
+            printf("\n");
+        }
     }
 }
 
-void handleInput(int* x,int*y){
-    char input=0;
+void handleCursor(unsigned long *X,unsigned long *Y) {
+    unsigned char key;
 
-    if (kbhit()){
-        input=getch();
-    }
-
-    switch (input)
-    {
-    case 'w' :
-        y++;
-        break;
-
-    case 'a':
-        x--;
-        break;
-
-    case 's':
-        y--;
-        break;
-
-    case 'd':
-        x++;
-        break;
+    if (kbhit()) {
+        key = getch();
+        
     }
 }
-
