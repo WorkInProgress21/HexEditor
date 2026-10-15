@@ -9,12 +9,13 @@
 long getFileSize(FILE *fileptr);
 void readFile(FILE *fileptr,unsigned long size, unsigned char*array);
 void displayFile(unsigned char*array,unsigned long size);
-void handleCursor(unsigned long *X,unsigned long *Y);
+void handleCursor(unsigned long *fileSize);
+
+unsigned long cursorPos=0;
 
 int main(void) {
     bool changeOccured = true;
     unsigned long size = 0;
-    unsigned long cursorX,cursorY;
 
     FILE *fileptr=fopen(TestFile, "rb");
 
@@ -34,7 +35,7 @@ int main(void) {
             displayFile(fileArray,size);
             changeOccured = false;
         }
-        getch();
+        handleCursor(&size);
     }
 
     fclose(fileptr);
@@ -68,11 +69,36 @@ void displayFile(unsigned char*array,unsigned long size) {
     }
 }
 
-void handleCursor(unsigned long *X,unsigned long *Y) {
+void handleCursor(unsigned long *fileSize) {
     unsigned char key;
 
     if (kbhit()) {
         key = getch();
-        
+        unsigned long biggestPossibleMovement;
+        biggestPossibleMovement=*fileSize-cursorPos;
+
+        switch (key) {
+            case 'w':
+                printf("w");
+                if (biggestPossibleMovement<16) {
+                    cursorPos+=biggestPossibleMovement;
+                }
+                else {
+                    cursorPos+=16;
+                }
+                break;
+            case 'a':
+                printf("a");
+                cursorPos-=1;
+                break;
+            case 's':
+                printf("s");
+                cursorPos-=16;
+                break;
+            case 'd':
+                printf("d");
+                cursorPos+=1;
+                break;
+        }
     }
 }
