@@ -9,17 +9,27 @@
 long getFileSize(FILE *fileptr);
 void readFile(FILE *fileptr,unsigned long size, unsigned char*array);
 void displayFile(unsigned char*array,unsigned long size);
-void handleCursor(unsigned long *fileSize);
-
-unsigned long cursorPos=0;
 
 int main(void) {
+    int columnAmount = 16;
+    char filePath[500]={};
     bool changeOccured = true;
     unsigned long size = 0;
 
-    FILE *fileptr=fopen(TestFile, "rb");
+    printf("Enter the amount of columns, standard is 16\n");
+    scanf("%d",&columnAmount);
+    printf("Press q to quit\n");
+    printf("Please enter the absolute Filepath to your File\n");
+    scanf("%s",filePath);
 
-    //printf("Provide a absolute Path to a File\n");
+    for (int i = 0; i<500;i++) {
+        if (filePath[i] == '\\') {
+            filePath[i]='/';
+        }
+    }
+
+    FILE *fileptr=fopen(filePath, "rb");
+
 
     if (fileptr == NULL) {
         printf("File not found\n");
@@ -35,9 +45,20 @@ int main(void) {
             displayFile(fileArray,size);
             changeOccured = false;
         }
-        handleCursor(&size);
+
+        unsigned char key;
+
+        if (kbhit()) {
+            key = getch();
+
+            switch (key) {
+                case 'q':
+                    return 0;
+            }
+        }
     }
 
+    getch();
     fclose(fileptr);
 
     return 0;
@@ -63,42 +84,8 @@ void displayFile(unsigned char*array,unsigned long size) {
     for (long i=0;i<size;i++) {
         printf("%02X",array[i]);
         printf(" ");
-        if ((i+1)%16 == 0) {
+        if ((i+1)%size == 0) {
             printf("\n");
-        }
-    }
-}
-
-void handleCursor(unsigned long *fileSize) {
-    unsigned char key;
-
-    if (kbhit()) {
-        key = getch();
-        unsigned long biggestPossibleMovement;
-        biggestPossibleMovement=*fileSize-cursorPos;
-
-        switch (key) {
-            case 'w':
-                printf("w");
-                if (biggestPossibleMovement<16) {
-                    cursorPos+=biggestPossibleMovement;
-                }
-                else {
-                    cursorPos+=16;
-                }
-                break;
-            case 'a':
-                printf("a");
-                cursorPos-=1;
-                break;
-            case 's':
-                printf("s");
-                cursorPos-=16;
-                break;
-            case 'd':
-                printf("d");
-                cursorPos+=1;
-                break;
         }
     }
 }
